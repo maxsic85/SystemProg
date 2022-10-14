@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace HomeWork01
 {
-    public class Unit : MonoBehaviour
+    public sealed class Unit : MonoBehaviour
     {
         [SerializeField] private int _health = 24;
         [SerializeField] private  bool _isUse = false;
@@ -13,10 +13,6 @@ namespace HomeWork01
 
         public bool IsUse { get => _isUse; private set => _isUse = value; }
 
-        private void Start()
-        {
-
-        }
 
         private void Update()
         {
@@ -27,6 +23,7 @@ namespace HomeWork01
             }
         }
 
+
         public void ReceiveHealing(ref bool isUse)
         {
             if (isUse) return;
@@ -34,9 +31,9 @@ namespace HomeWork01
             Coroutine coroutine = StartCoroutine(ResetCast());
         }
 
+
         private IEnumerator HealingCoroutine(int healthOneCastPower, int maxHealth)
-        {
-         
+        {       
             while (_health <= maxHealth)
             {
 
@@ -45,9 +42,9 @@ namespace HomeWork01
 
                 _health += healthOneCastPower;
                 yield return new WaitForSeconds(0.5f);
-            }
-          
+            }       
         }
+
 
         private IEnumerator ResetCast()
         {
