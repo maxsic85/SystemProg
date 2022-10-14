@@ -19,13 +19,13 @@ namespace HomeWork01
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = _cancelTokenSource.Token;
 
-            Task task = Task.Run(() => OnePrintAndClose(_cancelToken, _delay));
-            Task task2 = Task.Run(() => WaitForFPS(_cancelToken, _fps));
+            Task<int> task = WhatTaskFasterAsync
+                                (_cancelToken,
+                                OnePrintAndClose(_cancelToken, _delay),
+                                 WaitForFPS(_cancelToken, _fps));
 
-            task.Start();
-            task2.Start();
-
-            await Task.WhenAll(task, task2);
+            var taskResult = await Task.WhenAny(task);
+            Debug.Log(taskResult.Result);
         }
 
 
@@ -65,9 +65,19 @@ namespace HomeWork01
         }
 
 
+        private async Task<int> WhatTaskFasterAsync(CancellationToken cancellationToken, Task firstTask, Task secondTask)
+        {
+            var a = await Task<int>.WhenAny(firstTask, secondTask);
+            Debug.Log($"firstTask.IsCompleted= {firstTask.IsCompleted}");
+            Debug.Log($"second.IsCompleted= {secondTask.IsCompleted}");
+            return ((firstTask.IsCompleted && !secondTask.IsCompleted) && !cancellationToken.IsCancellationRequested) ? 1 : 0;
+        }
+
+
         private void OnDestroy()
         {
             _cancelTokenSource.Cancel();
         }
     }
+
 }
