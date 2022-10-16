@@ -39,7 +39,10 @@ namespace HomeWork01
             {
 
                 if ((_health + healthOneCastPower) > maxHealth)
+                {
+                    _health = _maxHealth;
                     yield break;
+                }
 
                 _health += healthOneCastPower;
                 yield return new WaitForSeconds(0.5f);
