@@ -6,7 +6,7 @@ using Unity.Jobs;
 namespace HomeWork02
 {
 
-    public struct JobStruct : IJob
+    public struct JobExample : IJob
     {
         public NativeArray<int> array;
         public void Execute()
@@ -16,6 +16,5 @@ namespace HomeWork02
                 if (array[i] > 10) array[i] = 0;
             }
         }
-
     }
 }

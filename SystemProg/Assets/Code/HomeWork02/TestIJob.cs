@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace HomeWork02
 {
-    public class TestJob:MonoBehaviour 
+    public class TestIJob : MonoBehaviour
     {
         private const int Length = 10;
 
@@ -19,9 +19,9 @@ namespace HomeWork02
                 Debug.Log($"input {array[i]}");
             }
 
-            JobStruct job = new JobStruct();
+            JobExample job = new JobExample();
             job.array = array;
-          
+
             JobHandle handle = job.Schedule();
             handle.Complete();
 
@@ -31,11 +31,8 @@ namespace HomeWork02
                 {
                     Debug.Log($"output: {job.array[i]}");
                 }
-              
             }
-                  
             array.Dispose();
-
         }
     }
 
