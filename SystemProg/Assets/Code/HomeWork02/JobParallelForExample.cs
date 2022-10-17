@@ -3,8 +3,6 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-
-
 namespace HomeWork02
 {
     public struct JobParallelForExample : IJobParallelFor
@@ -30,5 +28,4 @@ namespace HomeWork02
             }
         }
     }
-
 }
