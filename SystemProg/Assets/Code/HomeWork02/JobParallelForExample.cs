@@ -9,14 +9,12 @@ namespace HomeWork02
 {
     public struct JobParallelForExample : IJobParallelFor
     {
-        //   [ReadOnly]
-        [NativeDisableParallelForRestriction]
+        [ReadOnly]
         public NativeArray<Vector3> Positions;
-        // [ReadOnly]
-        [NativeDisableParallelForRestriction]
+        [ReadOnly]   
         public NativeArray<Vector3> Velocities;
-        //  [WriteOnly]
-        [NativeDisableParallelForRestriction]
+        [WriteOnly]
+        //[NativeDisableParallelForRestriction]
         public NativeArray<Vector3> FinalPositions;
         
 
@@ -28,7 +26,7 @@ namespace HomeWork02
             for (int i = 0; i < arrayLenght; i++)
             {
                 if (i == index) continue;
-                FinalPositions[i] = Positions[i] + Velocities[i];
+                FinalPositions[index] = Positions[i] + Velocities[i];
             }
         }
     }
