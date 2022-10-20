@@ -10,6 +10,7 @@ using HomeWork03.NetworkClient;
 
 namespace HomeWork03.View
 {
+    [System.Obsolete]
     public class UIController : MonoBehaviour
     {
         [SerializeField]
@@ -39,6 +40,7 @@ namespace HomeWork03.View
             buttonSendMessage.onClick.AddListener(() => SendMessage());
             client.onMessageReceive += ReceiveMessage;
         }
+
         private void StartServer()
         {
             server.StartServer();
