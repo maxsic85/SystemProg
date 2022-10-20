@@ -1,39 +1,57 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Jobs;
 
 
+
 public class TestJobForTransform:MonoBehaviour
 {
-    [SerializeField] public Transform[] m_Transforms;
-    TransformAccessArray m_AccessArray;
+    [SerializeField] private Transform[] _transforms;
+    [SerializeField] private int[] _velocities;
+
+    private TransformAccessArray _accessArray;
+    private NativeArray<int> _velocity;
+    private NativeArray<Vector3> _rotationSpeed;
+
+
     private void Awake()
     {
-        m_AccessArray = new TransformAccessArray(m_Transforms);
+        _accessArray = new TransformAccessArray(_transforms);
     }
+
+
+    private void Start()
+    {
+         _velocity = new NativeArray<int>(_transforms.Length, Allocator.Persistent);
+         _rotationSpeed = new NativeArray<Vector3>(_transforms.Length, Allocator.Persistent);
+
+        for (int i = 0; i < _transforms.Length; i++)
+        {
+            _velocity[i] = _velocities[i];
+        }
+    }
+
 
     private void Update()
     {
-
-        var velocity = new NativeArray<int>(m_Transforms.Length, Allocator.Persistent);
-    
-        // for (var i = 0; i < m_Transforms.Length; ++i)
-        //   velocity[i] = 100;
-      
         JobForTransforExample transformJob = new JobForTransforExample()
         {
-           Velocity = velocity,
-           DeltaTime = Time.deltaTime
+            Velocity = _velocity,
+            RotationSpeed = _rotationSpeed,
+            DeltaTime = Time.deltaTime
         };
-        JobHandle moveHandle = transformJob.Schedule(m_AccessArray);
+
+        JobHandle moveHandle = transformJob.Schedule(_accessArray);
         moveHandle.Complete();
-        velocity.Dispose();
-        
     }
+
 
     private void OnDestroy()
     {      
-        m_AccessArray.Dispose();
+        _accessArray.Dispose();
+        _velocity.Dispose();
+        _rotationSpeed.Dispose();
     }
 }
