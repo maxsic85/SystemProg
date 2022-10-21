@@ -10,7 +10,7 @@ namespace HoweWork03.NetworkServer
     public class Server : MonoBehaviour
     {
         private const int MAX_CONNECTION = 10;
-        private int port = 8000;
+        private int port = 8888;
         private int hostID;
         private int reliableChannel;
         private bool isStarted = false;
@@ -23,7 +23,10 @@ namespace HoweWork03.NetworkServer
         {
             NetworkTransport.Init();
             ConnectionConfig cc = new ConnectionConfig();
-            reliableChannel = cc.AddChannel(QosType.Reliable);
+            cc.SendDelay = 5;
+            cc.ConnectTimeout=200;
+
+            reliableChannel = cc.AddChannel(QosType.Unreliable);
             HostTopology topology = new HostTopology(cc, MAX_CONNECTION);
             hostID = NetworkTransport.AddHost(topology, port);
             isStarted = true;
@@ -81,6 +84,7 @@ namespace HoweWork03.NetworkServer
                     case NetworkEventType.ConnectEvent:
                         connectionIDs.Add(connectionId);
                         SendMessageToAll($"Player {connectionId} has connected.");
+                    //    SendMessageToAll($"Player {connectionId} has connected.");
                         Debug.Log($"Player {connectionId} has connected.");
                         break;
                     case NetworkEventType.DataEvent:

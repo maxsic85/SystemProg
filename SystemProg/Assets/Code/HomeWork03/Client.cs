@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 
 namespace HomeWork03.NetworkClient
 {
+    [System.Obsolete]
     public class Client : MonoBehaviour
     {
         public delegate void OnMessageReceive(object message);
@@ -13,19 +14,24 @@ namespace HomeWork03.NetworkClient
 
         private const int MAX_CONNECTION = 10;
         private int port = 0;
-        private int serverPort = 8000;
+        private int serverPort = 8888;
         private int hostID;
         private int reliableChannel;
         private int connectionID;
         private bool isConnected = false;
         private byte error;
 
+        public string MyLogin { get; set; }
+
 
         public void Connect()
         {
+           
             NetworkTransport.Init();
             ConnectionConfig cc = new ConnectionConfig();
-            reliableChannel = cc.AddChannel(QosType.Reliable);
+            reliableChannel = cc.AddChannel(QosType.Unreliable);
+            cc.SendDelay = 5;
+            cc.ConnectTimeout = 200;
             HostTopology topology = new HostTopology(cc, MAX_CONNECTION);
             hostID = NetworkTransport.AddHost(topology, port);
             connectionID = NetworkTransport.Connect(hostID, "127.0.0.1", serverPort, 0, out error);
@@ -64,6 +70,7 @@ namespace HomeWork03.NetworkClient
 
                     case NetworkEventType.ConnectEvent:
                         onMessageReceive?.Invoke($"You have been connected to server.");
+                        onMessageReceive?.Invoke($"My Login is {MyLogin}");
                         Debug.Log($"You have been connected to server.");
                         break;
                     case NetworkEventType.DataEvent:
