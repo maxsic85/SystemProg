@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 
 namespace HoweWork03.NetworkServer
 {
+    [System.Obsolete]
     public class Server : MonoBehaviour
     {
         private const int MAX_CONNECTION = 10;
@@ -15,10 +16,11 @@ namespace HoweWork03.NetworkServer
         private int reliableChannel;
         private bool isStarted = false;
         private byte error;
-        List<int> connectionIDs = new List<int>();
+
+        private Dictionary<int, string> _users = new Dictionary<int, string>();
+        private  List<int> connectionIDs = new List<int>();
 
 
-        [System.Obsolete]
         public void StartServer()
         {
             NetworkTransport.Init();
@@ -33,8 +35,7 @@ namespace HoweWork03.NetworkServer
         }
 
 
-        [System.Obsolete]
-        public void ShutDownServer()
+          public void ShutDownServer()
         {
             if (!isStarted) return;
             NetworkTransport.RemoveHost(hostID);
@@ -43,7 +44,7 @@ namespace HoweWork03.NetworkServer
         }
 
 
-        [System.Obsolete]
+     
         public void SendMessage(string message, int connectionID)
         {
             byte[] buffer = Encoding.Unicode.GetBytes(message);
@@ -53,8 +54,7 @@ namespace HoweWork03.NetworkServer
         }
 
 
-        [System.Obsolete]
-        public void SendMessageToAll(string message)
+           public void SendMessageToAll(string message)
         {
             for (int i = 0; i < connectionIDs.Count; i++)
             {
@@ -62,8 +62,7 @@ namespace HoweWork03.NetworkServer
             }
         }
 
-
-        [System.Obsolete]
+       
         private void Update()
         {
             if (!isStarted) return;
@@ -86,6 +85,10 @@ namespace HoweWork03.NetworkServer
                         SendMessageToAll($"Player {connectionId} has connected.");
                     //    SendMessageToAll($"Player {connectionId} has connected.");
                         Debug.Log($"Player {connectionId} has connected.");
+                  //      string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+                  //      _users.Add(connectionId, message1);
+                     //   Debug.Log($"Player {connectionId} has connected.");
+
                         break;
                     case NetworkEventType.DataEvent:
                         string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);

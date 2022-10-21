@@ -41,7 +41,7 @@ namespace HomeWork03.View
             LockBtns(false);
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = _cancelTokenSource.Token;
-            await GetLogin(_cancelToken, inputLogin.text);
+            await GetLogin(_cancelToken);
 
             LockBtns(true);
             buttonStartServer.onClick.AddListener(() => StartServer());
@@ -60,9 +60,9 @@ namespace HomeWork03.View
             buttonDisconnectClient.enabled = permissive;
         }
 
-        private async Task<string> GetLogin(CancellationToken cancellationToken, string text)
+        private async Task<string> GetLogin(CancellationToken cancellationToken)
         {
-            while (text == "")
+            while (inputLogin.text == "")
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
