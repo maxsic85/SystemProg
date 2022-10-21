@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -7,9 +8,11 @@ using UnityEngine.Networking;
 
 namespace HoweWork03.NetworkServer
 {
+
     [System.Obsolete]
     public class Server : MonoBehaviour
     {
+        public Action ServerIsStartedAction;
         private const int MAX_CONNECTION = 10;
         private int port = 8888;
         private int hostID;
@@ -18,33 +21,37 @@ namespace HoweWork03.NetworkServer
         private byte error;
 
         private Dictionary<int, string> _users = new Dictionary<int, string>();
-        private  List<int> connectionIDs = new List<int>();
+        private List<int> connectionIDs = new List<int>();
 
+        public bool IsStarted { get => isStarted; set => isStarted = value; }
 
         public void StartServer()
         {
             NetworkTransport.Init();
             ConnectionConfig cc = new ConnectionConfig();
             cc.SendDelay = 5;
-            cc.ConnectTimeout=200;
+            cc.ConnectTimeout = 200;
 
             reliableChannel = cc.AddChannel(QosType.Unreliable);
             HostTopology topology = new HostTopology(cc, MAX_CONNECTION);
             hostID = NetworkTransport.AddHost(topology, port);
-            isStarted = true;
+            IsStarted = true;
+            ServerIsStartedAction?.Invoke();
         }
 
 
-          public void ShutDownServer()
+        public void ShutDownServer()
         {
-            if (!isStarted) return;
+            if (!IsStarted) return;
+            _users.Clear();
             NetworkTransport.RemoveHost(hostID);
             NetworkTransport.Shutdown();
-            isStarted = false;
+            IsStarted = false;
+            ServerIsStartedAction?.Invoke();
         }
 
 
-     
+
         public void SendMessage(string message, int connectionID)
         {
             byte[] buffer = Encoding.Unicode.GetBytes(message);
@@ -54,7 +61,7 @@ namespace HoweWork03.NetworkServer
         }
 
 
-           public void SendMessageToAll(string message)
+        public void SendMessageToAll(string message)
         {
             for (int i = 0; i < connectionIDs.Count; i++)
             {
@@ -62,10 +69,10 @@ namespace HoweWork03.NetworkServer
             }
         }
 
-       
+
         private void Update()
         {
-            if (!isStarted) return;
+            if (!IsStarted) return;
             int recHostId;
             int connectionId;
             int channelId;
@@ -83,17 +90,22 @@ namespace HoweWork03.NetworkServer
                     case NetworkEventType.ConnectEvent:
                         connectionIDs.Add(connectionId);
                         SendMessageToAll($"Player {connectionId} has connected.");
-                    //    SendMessageToAll($"Player {connectionId} has connected.");
+                        //    SendMessageToAll($"Player {connectionId} has connected.");
                         Debug.Log($"Player {connectionId} has connected.");
-                  //      string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                  //      _users.Add(connectionId, message1);
-                     //   Debug.Log($"Player {connectionId} has connected.");
+                        string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+                        _users.Add(connectionId, message1);
+
+                        //   Debug.Log($"Player {connectionId} has connected.");
 
                         break;
                     case NetworkEventType.DataEvent:
                         string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                         SendMessageToAll($"Player {connectionId}: {message}");
-                        Debug.Log($"Player {connectionId}: {message}");
+                        if (_users[connectionId] == "")
+                        {
+                            _users[connectionId] = message;
+                        }
+                        Debug.Log($"Player {connectionId}: {_users[connectionId]}");
                         break;
                     case NetworkEventType.DisconnectEvent:
                         connectionIDs.Remove(connectionId);
@@ -106,6 +118,13 @@ namespace HoweWork03.NetworkServer
                 recData = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, recBuffer,
                 bufferSize, out dataSize, out error);
             }
+        }
+
+
+        private void OnDestroy()
+        {
+
+            ShutDownServer();
         }
     }
 }

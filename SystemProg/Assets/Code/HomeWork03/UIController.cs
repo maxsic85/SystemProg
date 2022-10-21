@@ -49,7 +49,9 @@ namespace HomeWork03.View
             buttonConnectClient.onClick.AddListener(() => Connect());
             buttonDisconnectClient.onClick.AddListener(() => Disconnect());
             buttonSendMessage.onClick.AddListener(() => SendMessage());
+
             client.onMessageReceive += ReceiveMessage;
+            server.ServerIsStartedAction += LockServersBtn;
         }
 
         private void LockBtns(bool permissive)
@@ -58,6 +60,18 @@ namespace HomeWork03.View
             buttonShutDownServer.enabled = permissive;
             buttonConnectClient.enabled = permissive;
             buttonDisconnectClient.enabled = permissive;
+
+
+        }
+
+        private void LockServersBtn()
+        {
+            if (server.IsStarted)
+            {
+                buttonStartServer.enabled = !server.IsStarted;
+                buttonConnectClient.enabled = !server.IsStarted;
+                buttonDisconnectClient.enabled = !server.IsStarted;
+            }
         }
 
         private async Task<string> GetLogin(CancellationToken cancellationToken)
@@ -123,6 +137,8 @@ namespace HomeWork03.View
         {
 
             _cancelTokenSource.Cancel();
+            client.onMessageReceive -= ReceiveMessage;
+            server.ServerIsStartedAction -= LockServersBtn;
 
         }
     }

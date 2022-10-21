@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -70,7 +71,17 @@ namespace HomeWork03.NetworkClient
 
                     case NetworkEventType.ConnectEvent:
                         onMessageReceive?.Invoke($"You have been connected to server.");
-                        onMessageReceive?.Invoke($"My Login is {MyLogin}");
+                        //var bbb = MyLogin.ToCharArray();
+
+                        //for (int i = 0; i < bbb.Length; i++)
+                        //{
+                        //    recBuffer[100+i] = ((byte)bbb[i]);
+                        //}
+
+                        //   onMessageReceive?.Invoke(MyLogin);
+                        SendMessage(MyLogin);
+                       // string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+                      //  onMessageReceive?.Invoke(message1);
                         Debug.Log($"You have been connected to server.");
                         break;
                     case NetworkEventType.DataEvent:
