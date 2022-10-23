@@ -121,8 +121,10 @@ namespace HomeWork03.View
 
         private void SendMessage()
         {
-            client.SendMessage(inputField.text);
+            var textmesage = new Message(inputField.text, MessageType.MESSAGE);
+            client.SendMessage(textmesage);
             inputField.text = "";
+            textmesage.Clear();
         }
 
 

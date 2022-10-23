@@ -82,11 +82,14 @@ namespace HomeWork03.NetworkClient
                         //   onMessageReceive?.Invoke(MyLogin);
                         // string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                         //  onMessageReceive?.Invoke(message1);
-                        SendMessage(ClientLogin);
+                        var loginmessage = new Message(ClientLogin, MessageType.LOGIN);
+                        SendMessage(loginmessage);
+                        loginmessage.Clear();
                         Debug.Log($"You have been connected to server.");
                         break;
                     case NetworkEventType.DataEvent:
                         string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+                       
                         onMessageReceive?.Invoke(message);
                         Debug.Log(message);
                         break;
@@ -104,12 +107,42 @@ namespace HomeWork03.NetworkClient
         }
 
 
-        public void SendMessage(string message)
+        public void SendMessage(Message message)
         {
-            byte[] buffer = Encoding.Unicode.GetBytes(message);
-            NetworkTransport.Send(_hostID, _connectionID, _reliableChannel, buffer, message.Length *
+            byte[] buffer = Encoding.Unicode.GetBytes(message._text);
+            NetworkTransport.Send(_hostID, _connectionID, _reliableChannel, buffer, message._text.Length *
+                sizeof(char), out _error);
+
+            byte[] buffertype = Encoding.Unicode.GetBytes(message._messageType.ToString());
+            NetworkTransport.Send(_hostID, _connectionID, _reliableChannel, buffertype, message._messageType.ToString().Length *
                 sizeof(char), out _error);
             if ((NetworkError)_error != NetworkError.Ok) Debug.Log((NetworkError)_error);
         }
     }
+}
+
+
+public struct Message
+{
+    internal string _text;
+    internal MessageType _messageType;
+
+    public Message(string text, MessageType messageType)
+    {
+        _text = text;
+        _messageType = messageType;
+    }
+
+    public void Clear()
+    {
+        _text = "";
+    }
+
+}
+
+
+public enum MessageType
+{
+    LOGIN = 0,
+    MESSAGE = 1
 }
