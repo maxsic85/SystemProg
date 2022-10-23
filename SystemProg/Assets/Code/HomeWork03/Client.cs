@@ -12,48 +12,52 @@ namespace HomeWork03.NetworkClient
     {
         public delegate void OnMessageReceive(object message);
         public event OnMessageReceive onMessageReceive;
-
+        public Action ClientIsConnectedAction;
         private const int MAX_CONNECTION = 10;
-        private int port = 0;
-        private int serverPort = 8888;
-        private int hostID;
-        private int reliableChannel;
-        private int connectionID;
-        private bool isConnected = false;
-        private byte error;
+        private int _port = 0;
+        private int _serverPort = 8888;
+        private int _hostID;
+        private int _reliableChannel;
+        private int _connectionID;
+        private byte _error;
 
-        public string MyLogin { get; set; }
+        public string ClientLogin { get; internal set; }
+        public bool IsConnected { get; private set; } = false;
 
 
         public void Connect()
         {
-           
             NetworkTransport.Init();
             ConnectionConfig cc = new ConnectionConfig();
-            reliableChannel = cc.AddChannel(QosType.Unreliable);
+            _reliableChannel = cc.AddChannel(QosType.Unreliable);
             cc.SendDelay = 5;
             cc.ConnectTimeout = 200;
             HostTopology topology = new HostTopology(cc, MAX_CONNECTION);
-            hostID = NetworkTransport.AddHost(topology, port);
-            connectionID = NetworkTransport.Connect(hostID, "127.0.0.1", serverPort, 0, out error);
-            if ((NetworkError)error == NetworkError.Ok)
-                isConnected = true;
+            _hostID = NetworkTransport.AddHost(topology, _port);
+            _connectionID = NetworkTransport.Connect(_hostID, "127.0.0.1", _serverPort, 0, out _error);
+            if ((NetworkError)_error == NetworkError.Ok)
+            {
+                IsConnected = true;
+                ClientIsConnectedAction?.Invoke();
+            }
+
             else
-                Debug.Log((NetworkError)error);
+                Debug.Log((NetworkError)_error);
         }
 
 
         public void Disconnect()
         {
-            if (!isConnected) return;
-            NetworkTransport.Disconnect(hostID, connectionID, out error);
-            isConnected = false;
+            if (!IsConnected) return;
+            NetworkTransport.Disconnect(_hostID, _connectionID, out _error);
+            IsConnected = false;
+            ClientIsConnectedAction?.Invoke();
         }
 
 
         private void Update()
         {
-            if (!isConnected) return;
+            if (!IsConnected) return;
             int recHostId;
             int connectionId;
             int channelId;
@@ -61,27 +65,24 @@ namespace HomeWork03.NetworkClient
             int bufferSize = 1024;
             int dataSize;
             NetworkEventType recData = NetworkTransport.Receive(out recHostId, out connectionId, out
-            channelId, recBuffer, bufferSize, out dataSize, out error);
+                channelId, recBuffer, bufferSize, out dataSize, out _error);
             while (recData != NetworkEventType.Nothing)
             {
                 switch (recData)
                 {
                     case NetworkEventType.Nothing:
                         break;
-
                     case NetworkEventType.ConnectEvent:
                         onMessageReceive?.Invoke($"You have been connected to server.");
                         //var bbb = MyLogin.ToCharArray();
-
                         //for (int i = 0; i < bbb.Length; i++)
                         //{
                         //    recBuffer[100+i] = ((byte)bbb[i]);
                         //}
-
                         //   onMessageReceive?.Invoke(MyLogin);
-                        SendMessage(MyLogin);
-                       // string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                      //  onMessageReceive?.Invoke(message1);
+                        // string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+                        //  onMessageReceive?.Invoke(message1);
+                        SendMessage(ClientLogin);
                         Debug.Log($"You have been connected to server.");
                         break;
                     case NetworkEventType.DataEvent:
@@ -90,7 +91,7 @@ namespace HomeWork03.NetworkClient
                         Debug.Log(message);
                         break;
                     case NetworkEventType.DisconnectEvent:
-                        isConnected = false;
+                        IsConnected = false;
                         onMessageReceive?.Invoke($"You have been disconnected from server.");
                         Debug.Log($"You have been disconnected from server.");
                         break;
@@ -98,7 +99,7 @@ namespace HomeWork03.NetworkClient
                         break;
                 }
                 recData = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, recBuffer,
-                bufferSize, out dataSize, out error);
+                    bufferSize, out dataSize, out _error);
             }
         }
 
@@ -106,9 +107,9 @@ namespace HomeWork03.NetworkClient
         public void SendMessage(string message)
         {
             byte[] buffer = Encoding.Unicode.GetBytes(message);
-            NetworkTransport.Send(hostID, connectionID, reliableChannel, buffer, message.Length *
-            sizeof(char), out error);
-            if ((NetworkError)error != NetworkError.Ok) Debug.Log((NetworkError)error);
+            NetworkTransport.Send(_hostID, _connectionID, _reliableChannel, buffer, message.Length *
+                sizeof(char), out _error);
+            if ((NetworkError)_error != NetworkError.Ok) Debug.Log((NetworkError)_error);
         }
     }
 }

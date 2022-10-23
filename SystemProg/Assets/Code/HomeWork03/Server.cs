@@ -14,17 +14,17 @@ namespace HoweWork03.NetworkServer
     {
         public Action ServerIsStartedAction;
         private const int MAX_CONNECTION = 10;
-        private int port = 8888;
-        private int hostID;
-        private int reliableChannel;
-        private bool isStarted = false;
-        private byte error;
-
+        private int _port = 8888;
+        private int _hostID;
+        private int _reliableChannel;
+        private bool _isStarted = false;
+        private byte _error;
         private Dictionary<int, string> _users = new Dictionary<int, string>();
-        private List<int> connectionIDs = new List<int>();
+        private List<int> _connectionIDs = new List<int>();
 
-        public bool IsStarted { get => isStarted; set => isStarted = value; }
+        public bool IsStarted { get => _isStarted; set => _isStarted = value; }
 
+        
         public void StartServer()
         {
             NetworkTransport.Init();
@@ -32,9 +32,9 @@ namespace HoweWork03.NetworkServer
             cc.SendDelay = 5;
             cc.ConnectTimeout = 200;
 
-            reliableChannel = cc.AddChannel(QosType.Unreliable);
+            _reliableChannel = cc.AddChannel(QosType.Unreliable);
             HostTopology topology = new HostTopology(cc, MAX_CONNECTION);
-            hostID = NetworkTransport.AddHost(topology, port);
+            _hostID = NetworkTransport.AddHost(topology, _port);
             IsStarted = true;
             ServerIsStartedAction?.Invoke();
         }
@@ -44,28 +44,27 @@ namespace HoweWork03.NetworkServer
         {
             if (!IsStarted) return;
             _users.Clear();
-            NetworkTransport.RemoveHost(hostID);
+            NetworkTransport.RemoveHost(_hostID);
             NetworkTransport.Shutdown();
             IsStarted = false;
             ServerIsStartedAction?.Invoke();
         }
 
-
-
+        
         public void SendMessage(string message, int connectionID)
         {
             byte[] buffer = Encoding.Unicode.GetBytes(message);
-            NetworkTransport.Send(hostID, connectionID, reliableChannel, buffer, message.Length *
-            sizeof(char), out error);
-            if ((NetworkError)error != NetworkError.Ok) Debug.Log((NetworkError)error);
+            NetworkTransport.Send(_hostID, connectionID, _reliableChannel, buffer, message.Length *
+            sizeof(char), out _error);
+            if ((NetworkError)_error != NetworkError.Ok) Debug.Log((NetworkError)_error);
         }
 
 
         public void SendMessageToAll(string message)
         {
-            for (int i = 0; i < connectionIDs.Count; i++)
+            for (int i = 0; i < _connectionIDs.Count; i++)
             {
-                SendMessage(message, connectionIDs[i]);
+                SendMessage(message, _connectionIDs[i]);
             }
         }
 
@@ -80,7 +79,7 @@ namespace HoweWork03.NetworkServer
             int bufferSize = 1024;
             int dataSize;
             NetworkEventType recData = NetworkTransport.Receive(out recHostId, out connectionId, out
-            channelId, recBuffer, bufferSize, out dataSize, out error);
+            channelId, recBuffer, bufferSize, out dataSize, out _error);
             while (recData != NetworkEventType.Nothing)
             {
                 switch (recData)
@@ -88,42 +87,52 @@ namespace HoweWork03.NetworkServer
                     case NetworkEventType.Nothing:
                         break;
                     case NetworkEventType.ConnectEvent:
-                        connectionIDs.Add(connectionId);
-                        SendMessageToAll($"Player {connectionId} has connected.");
-                        //    SendMessageToAll($"Player {connectionId} has connected.");
-                        Debug.Log($"Player {connectionId} has connected.");
+                        _connectionIDs.Add(connectionId);
+                       
                         string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                         _users.Add(connectionId, message1);
-
-                        //   Debug.Log($"Player {connectionId} has connected.");
-
+                     
+                        Debug.Log($" {_users[connectionId]} has connected.");
                         break;
                     case NetworkEventType.DataEvent:
                         string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                        SendMessageToAll($"Player {connectionId}: {message}");
-                        if (_users[connectionId] == "")
-                        {
-                            _users[connectionId] = message;
-                        }
-                        Debug.Log($"Player {connectionId}: {_users[connectionId]}");
+                        SendMessageToAll($" {_users[connectionId]}: {message}");
+                        AddNewUser(connectionId, message);
                         break;
                     case NetworkEventType.DisconnectEvent:
-                        connectionIDs.Remove(connectionId);
-                        SendMessageToAll($"Player {connectionId} has disconnected.");
-                        Debug.Log($"Player {connectionId} has disconnected.");
+                        RemoveUser(connectionId);
                         break;
                     case NetworkEventType.BroadcastEvent:
                         break;
                 }
                 recData = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, recBuffer,
-                bufferSize, out dataSize, out error);
+                bufferSize, out dataSize, out _error);
             }
+        }
+
+        
+        private void RemoveUser(int connectionId)
+        {
+            _users.Remove(connectionId);
+            _connectionIDs.Remove(connectionId);
+            SendMessageToAll($"Player {connectionId} has disconnected.");
+            Debug.Log($"Player {connectionId} has disconnected.");
+        }
+
+        
+        private void AddNewUser(int connectionId, string message)
+        {
+            if (_users[connectionId] == "")
+            {
+                _users[connectionId] = message;
+                SendMessageToAll($" {_users[connectionId]} has connected.");
+            }
+            Debug.Log($"Player {connectionId}: {_users[connectionId]}");
         }
 
 
         private void OnDestroy()
         {
-
             ShutDownServer();
         }
     }

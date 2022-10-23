@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using HoweWork03.NetworkServer;
@@ -8,42 +6,30 @@ using HomeWork03.NetworkClient;
 using System.Threading.Tasks;
 using System.Threading;
 
+
 namespace HomeWork03.View
 {
     [System.Obsolete]
     public class UIController : MonoBehaviour
     {
-        [SerializeField]
-        private Button buttonStartServer;
-        [SerializeField]
-        private Button buttonShutDownServer;
-        [SerializeField]
-        private Button buttonConnectClient;
-        [SerializeField]
-        private Button buttonDisconnectClient;
-        [SerializeField]
-        private Button buttonSendMessage;
-        [SerializeField]
-        private TMP_InputField inputField;
-        [SerializeField]
-        private TMP_InputField inputLogin;
-        [SerializeField]
-        private TextField textField;
-        [SerializeField]
-        private Server server;
-        [SerializeField]
-        private Client client;
-
+        [SerializeField] private Button buttonStartServer;
+        [SerializeField] private Button buttonShutDownServer;
+        [SerializeField] private Button buttonConnectClient;
+        [SerializeField] private Button buttonDisconnectClient;
+        [SerializeField] private Button buttonSendMessage;
+        [SerializeField] private TMP_InputField inputField;
+        [SerializeField] private TMP_InputField inputLogin;
+        [SerializeField] private TextField textField;
+        [SerializeField] private Server server;
+        [SerializeField] private Client client;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken;
+
+
         private async void Start()
         {
-            LockBtns(false);
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelToken = _cancelTokenSource.Token;
-            await GetLogin(_cancelToken);
+            await WaitForInputLogin();
 
-            LockBtns(true);
             buttonStartServer.onClick.AddListener(() => StartServer());
             buttonShutDownServer.onClick.AddListener(() => ShutDownServer());
             buttonConnectClient.onClick.AddListener(() => Connect());
@@ -51,27 +37,44 @@ namespace HomeWork03.View
             buttonSendMessage.onClick.AddListener(() => SendMessage());
 
             client.onMessageReceive += ReceiveMessage;
+            client.ClientIsConnectedAction += LockClientsBtn;
             server.ServerIsStartedAction += LockServersBtn;
         }
 
-        private void LockBtns(bool permissive)
+
+        private async Task WaitForInputLogin()
+        {
+            LockBtnsOnStarT(false);
+            _cancelTokenSource = new CancellationTokenSource();
+            _cancelToken = _cancelTokenSource.Token;
+            await GetLogin(_cancelToken);
+
+            LockBtnsOnStarT(true);
+        }
+
+
+        private void LockBtnsOnStarT(bool permissive)
         {
             buttonStartServer.enabled = permissive;
             buttonShutDownServer.enabled = permissive;
             buttonConnectClient.enabled = permissive;
             buttonDisconnectClient.enabled = permissive;
-
-
         }
+
 
         private void LockServersBtn()
         {
-            if (server.IsStarted)
-            {
-                buttonStartServer.enabled = !server.IsStarted;
-                buttonConnectClient.enabled = !server.IsStarted;
-                buttonDisconnectClient.enabled = !server.IsStarted;
-            }
+            buttonStartServer.enabled = !server.IsStarted;
+            buttonConnectClient.enabled = !server.IsStarted;
+            buttonDisconnectClient.enabled = !server.IsStarted;
+        }
+
+
+        private void LockClientsBtn()
+        {
+            buttonStartServer.enabled = !client.IsConnected;
+            buttonConnectClient.enabled = !client.IsConnected;
+            buttonShutDownServer.enabled = !client.IsConnected;
         }
 
         private async Task<string> GetLogin(CancellationToken cancellationToken)
@@ -83,9 +86,10 @@ namespace HomeWork03.View
                     Debug.Log($"Операция прервана токеном.");
                     return "token";
                 }
-                await Task.Yield();
 
+                await Task.Yield();
             }
+
             return inputField.text;
         }
 
@@ -93,30 +97,34 @@ namespace HomeWork03.View
         private void StartServer()
         {
             server.StartServer();
-
         }
+
 
         private void ShutDownServer()
         {
             server.ShutDownServer();
         }
 
+
         private void Connect()
         {
             client.Connect();
-            client.MyLogin = inputLogin.text;
+            client.ClientLogin = inputLogin.text;
         }
+
 
         private void Disconnect()
         {
             client.Disconnect();
         }
 
+
         private void SendMessage()
         {
             client.SendMessage(inputField.text);
             inputField.text = "";
         }
+
 
         public void ReceiveMessage(object message)
         {
@@ -135,11 +143,9 @@ namespace HomeWork03.View
 
         private void OnDestroy()
         {
-
             _cancelTokenSource.Cancel();
             client.onMessageReceive -= ReceiveMessage;
             server.ServerIsStartedAction -= LockServersBtn;
-
         }
     }
 }
