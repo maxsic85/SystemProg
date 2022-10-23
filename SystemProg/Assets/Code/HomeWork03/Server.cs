@@ -88,7 +88,7 @@ namespace HoweWork03.NetworkServer
                         break;
                     case NetworkEventType.ConnectEvent:
                         _connectionIDs.Add(connectionId);
-                       
+                       var type= Encoding.Unicode.GetString(recBuffer, 0, 2);
                         string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                         _users.Add(connectionId, message1);
                      

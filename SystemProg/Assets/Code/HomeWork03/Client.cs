@@ -109,13 +109,12 @@ namespace HomeWork03.NetworkClient
 
         public void SendMessage(Message message)
         {
-            byte[] buffer = Encoding.Unicode.GetBytes(message._text);
-            NetworkTransport.Send(_hostID, _connectionID, _reliableChannel, buffer, message._text.Length *
-                sizeof(char), out _error);
+            byte[] buffer = Encoding.Unicode.GetBytes((int)message._messageType+message._text);
+            var lenght1 = 2;
+            var lenght2= ((message._text.Length) * sizeof(char));
+            var lenght = lenght1 + lenght2;
+            NetworkTransport.Send(_hostID, _connectionID, _reliableChannel, buffer,lenght , out _error);
 
-            byte[] buffertype = Encoding.Unicode.GetBytes(message._messageType.ToString());
-            NetworkTransport.Send(_hostID, _connectionID, _reliableChannel, buffertype, message._messageType.ToString().Length *
-                sizeof(char), out _error);
             if ((NetworkError)_error != NetworkError.Ok) Debug.Log((NetworkError)_error);
         }
     }
@@ -143,6 +142,6 @@ public struct Message
 
 public enum MessageType
 {
-    LOGIN = 0,
-    MESSAGE = 1
+    LOGIN = 1,
+    MESSAGE = 2
 }
