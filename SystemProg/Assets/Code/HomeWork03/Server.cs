@@ -24,7 +24,7 @@ namespace HoweWork03.NetworkServer
 
         public bool IsStarted { get => _isStarted; set => _isStarted = value; }
 
-        
+
         public void StartServer()
         {
             NetworkTransport.Init();
@@ -50,7 +50,7 @@ namespace HoweWork03.NetworkServer
             ServerIsStartedAction?.Invoke();
         }
 
-        
+
         public void SendMessage(string message, int connectionID)
         {
             byte[] buffer = Encoding.Unicode.GetBytes(message);
@@ -88,14 +88,13 @@ namespace HoweWork03.NetworkServer
                         break;
                     case NetworkEventType.ConnectEvent:
                         _connectionIDs.Add(connectionId);
-                       var type= Encoding.Unicode.GetString(recBuffer, 0, 2);
-                        string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+                        string message1 = GetMessageByType(recBuffer, dataSize);
                         _users.Add(connectionId, message1);
-                     
                         Debug.Log($" {_users[connectionId]} has connected.");
                         break;
                     case NetworkEventType.DataEvent:
-                        string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+
+                        string message = GetMessageByType(recBuffer, dataSize);
                         SendMessageToAll($" {_users[connectionId]}: {message}");
                         AddNewUser(connectionId, message);
                         break;
@@ -110,7 +109,27 @@ namespace HoweWork03.NetworkServer
             }
         }
 
-        
+        private string GetMessageByType(byte[] recBuffer, int dataSize)
+        {
+            var type = Encoding.Unicode.GetString(recBuffer, 0, 2);
+            switch (type)
+            {
+
+                case "1":
+                    Debug.Log($"Login");
+                    break;
+
+                case "2":
+                    Debug.Log($"Text");
+                    break;
+
+                default:
+                    return "";
+    
+            }
+            return Encoding.Unicode.GetString(recBuffer, 2, dataSize - 2);
+        }
+
         private void RemoveUser(int connectionId)
         {
             _users.Remove(connectionId);
@@ -119,7 +138,7 @@ namespace HoweWork03.NetworkServer
             Debug.Log($"Player {connectionId} has disconnected.");
         }
 
-        
+
         private void AddNewUser(int connectionId, string message)
         {
             if (_users[connectionId] == "")
