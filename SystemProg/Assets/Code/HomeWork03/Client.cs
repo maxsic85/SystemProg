@@ -74,14 +74,6 @@ namespace HomeWork03.NetworkClient
                         break;
                     case NetworkEventType.ConnectEvent:
                         onMessageReceive?.Invoke($"You have been connected to server.");
-                        //var bbb = MyLogin.ToCharArray();
-                        //for (int i = 0; i < bbb.Length; i++)
-                        //{
-                        //    recBuffer[100+i] = ((byte)bbb[i]);
-                        //}
-                        //   onMessageReceive?.Invoke(MyLogin);
-                        // string message1 = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                        //  onMessageReceive?.Invoke(message1);
                         var loginmessage = new Message(ClientLogin, MessageType.LOGIN);
                         SendMessage(loginmessage);
                         loginmessage.Clear();
@@ -118,30 +110,4 @@ namespace HomeWork03.NetworkClient
             if ((NetworkError)_error != NetworkError.Ok) Debug.Log((NetworkError)_error);
         }
     }
-}
-
-
-public struct Message
-{
-    internal string _text;
-    internal MessageType _messageType;
-
-    public Message(string text, MessageType messageType)
-    {
-        _text = text;
-        _messageType = messageType;
-    }
-
-    public void Clear()
-    {
-        _text = "";
-    }
-
-}
-
-
-public enum MessageType
-{
-    LOGIN = 1,
-    MESSAGE = 2
 }

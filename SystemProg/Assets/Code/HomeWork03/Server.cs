@@ -21,9 +21,10 @@ namespace HoweWork03.NetworkServer
         private byte _error;
         private Dictionary<int, string> _users = new Dictionary<int, string>();
         private List<int> _connectionIDs = new List<int>();
+        private MessageType messageType;
 
         public bool IsStarted { get => _isStarted; set => _isStarted = value; }
-
+        public MessageType MessageType { get => messageType; set => messageType = value; }
 
         public void StartServer()
         {
@@ -62,6 +63,17 @@ namespace HoweWork03.NetworkServer
 
         public void SendMessageToAll(string message)
         {
+            switch (MessageType)
+            {
+                case MessageType.LOGIN:
+                    message = $"LOGIN {message}";
+                     break;
+                case MessageType.MESSAGE:
+                    message = $"MESSAGE FROM {message}";
+                    break;
+                default:
+                    break;
+            }
             for (int i = 0; i < _connectionIDs.Count; i++)
             {
                 SendMessage(message, _connectionIDs[i]);
@@ -109,6 +121,7 @@ namespace HoweWork03.NetworkServer
             }
         }
 
+
         private string GetMessageByType(byte[] recBuffer, int dataSize)
         {
             var type = Encoding.Unicode.GetString(recBuffer, 0, 2);
@@ -117,18 +130,22 @@ namespace HoweWork03.NetworkServer
 
                 case "1":
                     Debug.Log($"Login");
+                    MessageType = MessageType.LOGIN;
                     break;
 
                 case "2":
                     Debug.Log($"Text");
+                    MessageType = MessageType.MESSAGE;
+
                     break;
 
                 default:
                     return "";
-    
+
             }
             return Encoding.Unicode.GetString(recBuffer, 2, dataSize - 2);
         }
+
 
         private void RemoveUser(int connectionId)
         {
@@ -144,7 +161,6 @@ namespace HoweWork03.NetworkServer
             if (_users[connectionId] == "")
             {
                 _users[connectionId] = message;
-                SendMessageToAll($" {_users[connectionId]} has connected.");
             }
             Debug.Log($"Player {connectionId}: {_users[connectionId]}");
         }

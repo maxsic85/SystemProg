@@ -11,7 +11,7 @@ namespace HomeWork03.View
     public class TextField : MonoBehaviour
     {
         [SerializeField]
-        private TextMeshProUGUI textObject;
+        public TextMeshProUGUI textObject;
         [FormerlySerializedAs("scrollbar")] [SerializeField]
         private Scrollbar _scrollbar;
         private List<string> _messages = new List<string>();

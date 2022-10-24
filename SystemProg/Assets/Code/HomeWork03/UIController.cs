@@ -5,6 +5,8 @@ using HoweWork03.NetworkServer;
 using HomeWork03.NetworkClient;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Text;
+
 
 
 namespace HomeWork03.View
@@ -130,7 +132,10 @@ namespace HomeWork03.View
 
         public void ReceiveMessage(object message)
         {
+            textField.textObject.color = (message.ToString().Contains("LOGIN")) ? Color.red : Color.green;
+
             textField.ReceiveMessage(message);
+
         }
 
 
