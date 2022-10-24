@@ -1,3 +1,4 @@
+using HomeWork03.NetworkClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +14,8 @@ namespace HoweWork03.NetworkServer
     public class Server : MonoBehaviour
     {
         public Action ServerIsStartedAction;
+        public delegate void OnMessageSend(object message);
+        public event OnMessageSend onMessageSend;
         private const int MAX_CONNECTION = 10;
         private int _port = 8888;
         private int _hostID;
@@ -57,6 +60,7 @@ namespace HoweWork03.NetworkServer
             byte[] buffer = Encoding.Unicode.GetBytes(message);
             NetworkTransport.Send(_hostID, connectionID, _reliableChannel, buffer, message.Length *
             sizeof(char), out _error);
+         
             if ((NetworkError)_error != NetworkError.Ok) Debug.Log((NetworkError)_error);
         }
 
@@ -78,6 +82,7 @@ namespace HoweWork03.NetworkServer
             {
                 SendMessage(message, _connectionIDs[i]);
             }
+            onMessageSend?.Invoke(message);
         }
 
 
@@ -151,8 +156,8 @@ namespace HoweWork03.NetworkServer
         {
             _users.Remove(connectionId);
             _connectionIDs.Remove(connectionId);
-            SendMessageToAll($"Player {connectionId} has disconnected.");
-            Debug.Log($"Player {connectionId} has disconnected.");
+            SendMessageToAll($"Player {_users[connectionId]} has disconnected.");
+            Debug.Log($"Player {_users[connectionId]} has disconnected.");
         }
 
 

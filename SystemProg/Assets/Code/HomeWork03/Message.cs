@@ -1,17 +1,20 @@
-﻿public struct Message
+﻿namespace HomeWork03.NetworkClient
 {
-    internal string _text;
-    internal MessageType _messageType;
-
-    public Message(string text, MessageType messageType)
+    public struct Message
     {
-        _text = text;
-        _messageType = messageType;
-    }
+        internal string _text;
+        internal MessageType _messageType;
 
-    public void Clear()
-    {
-        _text = "";
-    }
+        public Message(string text, MessageType messageType)
+        {
+            _text = text;
+            _messageType = messageType;
+        }
 
+        public void Clear()
+        {
+            _text = "";
+        }
+
+    }
 }

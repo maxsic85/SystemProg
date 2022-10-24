@@ -6,8 +6,7 @@ using HomeWork03.NetworkClient;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Text;
-
-
+using System;
 
 namespace HomeWork03.View
 {
@@ -41,8 +40,9 @@ namespace HomeWork03.View
             client.onMessageReceive += ReceiveMessage;
             client.ClientIsConnectedAction += LockClientsBtn;
             server.ServerIsStartedAction += LockServersBtn;
+            server.onMessageSend += PrintLogInfo;
         }
-
+               
 
         private async Task WaitForInputLogin()
         {
@@ -118,6 +118,7 @@ namespace HomeWork03.View
         private void Disconnect()
         {
             client.Disconnect();
+            client.ClientLogin = "";
         }
 
 
@@ -136,6 +137,12 @@ namespace HomeWork03.View
 
             textField.ReceiveMessage(message);
 
+        }
+
+
+        private void PrintLogInfo(object message)
+        {
+            textField.ReceiveMessage(message);
         }
 
 

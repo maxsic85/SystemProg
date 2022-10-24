@@ -1,5 +1,8 @@
-﻿public enum MessageType
+﻿namespace HomeWork03.NetworkClient
 {
-    LOGIN = 1,
-    MESSAGE = 2
+    public enum MessageType
+    {
+        LOGIN = 1,
+        MESSAGE = 2
+    }
 }
