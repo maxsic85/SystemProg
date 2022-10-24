@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LLAPI.unity
     guid: 93c58562731d7274ab7a04409284b475
+  - enabled: 1
+    path: Assets/Scenes/HLAPI_OFFLINE.unity
+    guid: d0d1100605ba3e549a575863834cc210
   m_configObjects: {}
