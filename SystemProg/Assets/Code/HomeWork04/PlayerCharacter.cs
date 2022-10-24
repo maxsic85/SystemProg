@@ -70,7 +70,7 @@ namespace HomeWork04.HLAPI
             {
                 return;
             }
-            var info = $"Health: {health}\nClip: {fireAction.BulletCount}";
+            var info = $"Health: {health}\nClip: {fireAction.bulletCount}";
             var size = 12;
             var bulletCountSize = 50;
             var posX = Camera.main.pixelWidth / 2 - size / 4;

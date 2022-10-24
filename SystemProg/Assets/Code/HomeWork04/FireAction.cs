@@ -11,7 +11,7 @@ namespace HomeWork04.HLAPI
     {
         [SerializeField] private GameObject bulletPrefab;
         [SerializeField] private int startAmmunition = 20;
-        protected string bulletCount = string.Empty;
+        internal string bulletCount = string.Empty;
         protected Queue<GameObject> bullets = new Queue<GameObject>();
         protected Queue<GameObject> ammunition = new Queue<GameObject>();
         protected bool reloading = false;
