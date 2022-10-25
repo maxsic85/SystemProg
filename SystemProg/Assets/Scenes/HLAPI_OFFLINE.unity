@@ -257,6 +257,7 @@ MonoBehaviour:
   m_OnlineScene: HLAPI_ONLINE
   m_SpawnPrefabs:
   - {fileID: 1729567778445609408, guid: d521bad7cd5b6424790db3a5f663253b, type: 3}
+  - {fileID: 3872449532944966937, guid: c38577d064654914b89a5f89f0b4f735, type: 3}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

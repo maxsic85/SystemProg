@@ -12,6 +12,7 @@ namespace HomeWork04.HLAPI
         protected Action OnUpdateAction { get; set; }
         protected abstract FireAction fireAction { get; set; }
         [SyncVar] protected Vector3 serverPosition;
+        [SyncVar] protected Quaternion serverRotation;
         
         
         protected virtual void Initiate()
@@ -33,9 +34,10 @@ namespace HomeWork04.HLAPI
         
         
         [Command]
-        protected void CmdUpdatePosition(Vector3 position)
+        protected void CmdUpdatePosition(Vector3 position, Quaternion rotation)
         {
             serverPosition = position;
+            serverRotation = rotation;
         }
         
         
