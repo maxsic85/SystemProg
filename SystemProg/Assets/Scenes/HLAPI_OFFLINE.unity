@@ -178,7 +178,40 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 3743704770374698381, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3743704770374698381, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 4443993741059133126, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4443993741059133126, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 53
+      objectReference: {fileID: 0}
+    - target: {fileID: 4675717253461443304, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4675717253461443304, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682617364445664738, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682617364445664738, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 53
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8575942452657479464, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ec6333f4df173b64a867b2e30da786f1, type: 3}
 --- !u!1 &1951099004
 GameObject:
@@ -249,7 +282,7 @@ MonoBehaviour:
   m_RunInBackground: 1
   m_ScriptCRCCheck: 1
   m_MaxDelay: 0.01
-  m_LogLevel: 2
+  m_LogLevel: 0
   m_PlayerPrefab: {fileID: 8774043647445894076, guid: 1456ee79f16436d44acbfeaa2014da95, type: 3}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0

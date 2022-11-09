@@ -1,7 +1,6 @@
 using UnityEngine;
 
 
-
 namespace HomeWork04.HLAPI
 {
     public class PlayerCharacter : Character
@@ -14,8 +13,8 @@ namespace HomeWork04.HLAPI
         private MouseLook mouseLook;
         private Vector3 currentVelocity;
         protected override FireAction fireAction { get; set; }
-        
-        
+
+
         protected override void Initiate()
         {
             base.Initiate();
@@ -26,14 +25,15 @@ namespace HomeWork04.HLAPI
             mouseLook = GetComponentInChildren<MouseLook>();
             mouseLook ??= gameObject.AddComponent<MouseLook>();
         }
-        
-        
+
+
         public override void Movement()
         {
             if (mouseLook != null && mouseLook.PlayerCamera != null)
             {
                 mouseLook.PlayerCamera.enabled = hasAuthority;
             }
+
             if (hasAuthority)
             {
                 var moveX = Input.GetAxis("Horizontal") * movingSpeed;
@@ -45,32 +45,35 @@ namespace HomeWork04.HLAPI
                 {
                     movement *= acceleration;
                 }
+
                 movement.y = gravity;
                 movement = transform.TransformDirection(movement);
                 characterController.Move(movement);
                 mouseLook.Rotation();
-                CmdUpdatePosition(transform.position,transform.rotation);
+                CmdUpdatePosition(transform.position, transform.rotation);
             }
             else
             {
-                transform.position = Vector3.SmoothDamp(transform.position,serverPosition, ref currentVelocity, movingSpeed * Time.deltaTime);
+                transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref currentVelocity,
+                    movingSpeed * Time.deltaTime);
                 transform.rotation = serverRotation;
             }
         }
-        
-        
+
+
         private void Start()
         {
             Initiate();
         }
-        
-        
+
+
         private void OnGUI()
         {
             if (Camera.main == null)
             {
                 return;
             }
+
             var info = $"Health: {health}\nClip: {fireAction.bulletCount}";
             var size = 12;
             var bulletCountSize = 50;

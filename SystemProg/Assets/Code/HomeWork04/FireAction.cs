@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 
+
 namespace HomeWork04.HLAPI
 {
     public abstract class FireAction : MonoBehaviour
@@ -16,6 +17,7 @@ namespace HomeWork04.HLAPI
         protected Queue<GameObject> ammunition = new Queue<GameObject>();
         protected bool reloading = false;
 
+        
         protected virtual void Start()
         {
             for (var i = 0; i < startAmmunition; i++)
